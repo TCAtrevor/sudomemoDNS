@@ -171,6 +171,8 @@ try:
     zones = loads(get_zones.read())
 except ValueError as e:
     print("[ERROR] Unable load DNS data: Invalid JSON.")
+    print("[ERROR] Exception: ", e)
+    exit(1)
 
 for zone in zones:
     if zone["type"] == "a":
