@@ -9,9 +9,6 @@ from time import sleep
 from dnslib import A, AAAA, CNAME, MX, NS, SOA, TXT
 from dnslib import DNSLabel, QTYPE, RD, RR
 from dnslib.server import DNSServer
-from requests import get
-from requests.exceptions import RequestException
-from requests.exceptions import Timeout
 
 
 def get_platform():
@@ -165,18 +162,15 @@ class Record:
 ZONES = {}
 
 try:
-    get_zones = get("https://www.sudomemo.net/api/dns_zones.json",
-                    headers={'User-Agent': 'SudomemoDNS/' + SUDOMEMODNS_VERSION + ' (' + get_platform() + ')'})
-except Timeout:
-    print("[ERROR] Unable to load DNS data: Connection to Sudomemo timed out. Are you connected to the Internet?")
-except RequestException as e:
+    get_zones = open("dns_zones.json", "rb")
+except OSError as e:
     print("[ERROR] Unable load DNS data.")
     print("[ERROR] Exception: ", e)
     exit(1)
 try:
-    zones = loads(get_zones.text)
+    zones = loads(get_zones.read())
 except ValueError as e:
-    print("[ERROR] Unable load DNS data: Invalid response from server. Check that you can visit sudomemo.net")
+    print("[ERROR] Unable load DNS data: Invalid JSON.")
 
 for zone in zones:
     if zone["type"] == "a":
